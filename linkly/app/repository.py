@@ -63,6 +63,24 @@ class LinkRepository:
         ).fetchall()
         return [_row_to_link(r) for r in rows]
 
+    def count_for_links(self, link_ids: list[int]) -> dict[int, int]:
+        placeholders = ",".join("?" for _ in link_ids)
+        result = self.conn.execute(
+            f"""
+                select link_id, count(*) as n
+                from clicks 
+                where link_id in ({placeholders})
+                group by link_id
+            """,
+            link_ids
+        ).fetchall()
+
+        mapping: dict[int, int] = {}
+        for link_id, count in result:
+            mapping[link_id] = count
+
+        return mapping
+
     def delete(self, code: str) -> bool:
         cur = self.conn.execute("DELETE FROM links WHERE code = ?", (code,))
         self.conn.commit()

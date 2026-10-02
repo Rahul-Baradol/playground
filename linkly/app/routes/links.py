@@ -38,9 +38,13 @@ def list_links(
     clicks: ClickRepository = Depends(get_click_repo),
     settings: Settings = Depends(get_settings),
 ) -> list[LinkOut]:
+    recent = links.list_recent(limit, offset)
+    link_ids = [link.id for link in recent]
+    mapping = links.count_for_links(link_ids)
+
     return [
-        LinkOut.from_link(link, settings.base_url, clicks.count_for_link(link.id))
-        for link in links.list_recent(limit, offset)
+        LinkOut.from_link(link, settings.base_url, mapping.get(link.id))
+        for link in recent
     ]
 
 
