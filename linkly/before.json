@@ -1,0 +1,22 @@
+{
+  "GET /api/links?limit=200": {
+    "small": 94.6957494597882,
+    "large": 839.3910414888524
+  },
+  "GET /api/links/{code}/stats": {
+    "small": 8.891270961612463,
+    "large": 155.94593749847263
+  },
+  "GET /{code} (redirect, cached)": {
+    "small": 3.3043749863281846,
+    "large": 3.2315835123881698
+  },
+  "DELETE /api/links/{code}": {
+    "small": 4.6767289750278,
+    "large": 16.20837446535006
+  },
+  "rate_limiter.allow() [us]": {
+    "small": 100.69466650020331,
+    "large": 720.1575625222176
+  }
+}
