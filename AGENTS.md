@@ -1,4 +1,4 @@
-# Agent guide: claude-playground
+# Agent guide: code-playground
 
 This repo holds **practice codebases** for the user to improve as a software
 engineer. Each top-level folder is one self-contained challenge: a realistic,
