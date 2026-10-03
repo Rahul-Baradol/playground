@@ -1,3 +1,4 @@
+from collections import deque
 import threading
 import time
 from collections import defaultdict
@@ -16,21 +17,32 @@ class SlidingWindowRateLimiter:
         self.max_requests = max_requests
         self.window_seconds = window_seconds
         self._clock = clock
-        self._hits: dict[str, list[float]] = defaultdict(list)
+        self._hits: dict[str, deque[float]] = defaultdict(deque)
         self._lock = threading.Lock()
+
+    def _prune(self, key: str, now: float) -> deque[float]:
+        hits = self._hits.get(key)
+        if hits is None:
+            return deque()
+        while len(hits) > 0 and (now - hits[0]) >= self.window_seconds:
+            hits.popleft()
+        if len(hits) == 0:
+            del self._hits[key]
+        return hits
 
     def allow(self, key: str) -> bool:
         now = self._clock()
         with self._lock:
-            hits = self._hits[key]
-            recent = [t for t in hits if now - t < self.window_seconds]
-            if len(recent) >= self.max_requests:
+            hits = self._prune(key, now)
+            if len(hits) >= self.max_requests:
                 return False
+            if len(hits) == 0:
+                self._hits[key] = hits
             hits.append(now)
             return True
 
     def remaining(self, key: str) -> int:
         now = self._clock()
         with self._lock:
-            recent = [t for t in self._hits.get(key, []) if now - t < self.window_seconds]
-            return max(0, self.max_requests - len(recent))
+            current = self._prune(key, now)
+            return max(0, self.max_requests - len(current))
