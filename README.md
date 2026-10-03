@@ -1,12 +1,11 @@
-# claude-playground
+# code-playground
 
-Practice codebases for sharpening software-engineering skills.
+Small Python projects for sharpening software-engineering skills.
 
-Each folder is a small, working Python project with 2–3 hidden performance bugs.
-Find them, fix them, and prove the speedup with the included benchmark.
+Each project is intentionally seeded with a few performance bugs. Find them, fix them, and prove the improvements with the included benchmarks.
 
-| Challenge | What it is | Start here |
-|---|---|---|
-| [linkly](linkly/) | URL shortener + click analytics (FastAPI, SQLite) | [CHALLENGE.md](linkly/CHALLENGE.md) |
+| Challenge         | Description                     | Start here                          |
+| ----------------- | ------------------------------- | ----------------------------------- |
+| [linkly](linkly/) | URL shortener + click analytics | [CHALLENGE.md](linkly/CHALLENGE.md) |
 
-Want a new one? Ask Claude: *"Create a new playground challenge."*
+More challenges coming soon.
