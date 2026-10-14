@@ -112,3 +112,4 @@ Update this table whenever a challenge is added.
 | Folder | Domain | Level | Bug categories used |
 |---|---|---|---|
 | `linkly` | URL shortener + analytics (FastAPI, SQLite) | Intermediate | N+1 queries; index on the wrong column (schema); unbounded in-memory state in the rate limiter |
+| `stockroom` | Inventory + orders API (FastAPI, SQLite) | Intermediate | Blocking I/O in an `async def` handler (concurrency); `lru_cache` on a per-request object (caching); O(n×m) nested loop in a report (algorithmic) |
