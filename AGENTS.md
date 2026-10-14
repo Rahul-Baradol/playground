@@ -32,6 +32,7 @@ wants to change it.
   type hints, a sensible layering of routes → services → repository.
 - **Never leave hints in the code.** No comments, names or TODOs that point at
   a bug.
+- Don't add vague follow-up challenges in the end. Very unlikely that the user would want to solve them later on.
 
 ### 3. Bug rules
 - Plant 2–3 bugs. They are **efficiency bugs, not correctness bugs**: the full
