@@ -28,36 +28,34 @@ class ReorderService:
 
     def report(self, now: float) -> ReorderReport:
         since = now - self.window_days * SECONDS_PER_DAY
-        products = self.products.list_all()
+        # products = self.products.list_all()
+        # sales = self.stock.sales_since(since)
+
         on_hand = self.stock.on_hand_all()
-        sales = self.stock.sales_since(since)
+        sales_data = self.stock.units_sold_per_product(since)
 
         suggestions = []
-        for product in products:
-            product_sales = [m for m in sales if m.product_id == product.id]
-            if not product_sales:
-                continue
-
-            units_sold = -sum(m.delta for m in product_sales)
+        for product in sales_data:
+            units_sold = -product["units_sold"]
             daily_rate = units_sold / self.window_days
-            stock = max(on_hand.get(product.id, 0), 0)
+            stock = max(on_hand.get(product["id"], 0), 0)
             days_of_cover = stock / daily_rate
-            horizon = product.lead_time_days + self.safety_days
+            horizon = product["lead_time_days"] + self.safety_days
             if days_of_cover >= horizon:
                 continue
 
             target = math.ceil(daily_rate * (horizon + self.window_days))
             suggestions.append(
                 ReorderSuggestion(
-                    sku=product.sku,
-                    name=product.name,
+                    sku=product["sku"],
+                    name=product["name"],
                     on_hand=stock,
                     units_sold=units_sold,
                     daily_rate=round(daily_rate, 3),
                     days_of_cover=round(days_of_cover, 1),
-                    lead_time_days=product.lead_time_days,
+                    lead_time_days=product["lead_time_days"],
                     suggested_quantity=max(target - stock, 0),
-                    last_sold_at=to_dt(max(m.created_at for m in product_sales)),
+                    last_sold_at=to_dt(product["last_sold_at"]),
                 )
             )
 

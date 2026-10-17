@@ -1,3 +1,4 @@
+from typing import Any
 import sqlite3
 from dataclasses import dataclass
 
@@ -179,6 +180,34 @@ class StockRepository:
             (since,),
         ).fetchall()
         return [StockMovement(**{key: r[key] for key in r.keys()}) for r in rows]
+
+    def units_sold_per_product(self, since) -> list[dict[str, int]]:
+        rows = self.conn.execute(
+            """
+            SELECT  sm.product_id as id, 
+                    SUM(sm.delta) as units_sold, 
+                    MAX(sm.created_at) as last_sold_at, 
+                    p.lead_time_days as lead_time_days, 
+                    p.sku as sku, 
+                    p.name as name
+            FROM    stock_movements as sm
+            LEFT JOIN products as p ON sm.product_id = p.id
+            WHERE   sm.reason = 'sale' 
+                    AND sm.created_at >= ?
+            GROUP BY sm.product_id
+            """,
+            (since,),
+        ).fetchall()
+        return [
+            {
+                "id": row["id"],
+                "units_sold": row["units_sold"],
+                "last_sold_at": row["last_sold_at"],
+                "lead_time_days": row["lead_time_days"],
+                "sku": row["sku"],
+                "name": row["name"]
+            } for row in rows
+        ]
 
 
 class OrderRepository:
