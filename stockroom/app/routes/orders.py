@@ -16,7 +16,7 @@ router = APIRouter(prefix="/api/orders", tags=["orders"])
 
 
 @router.post("", response_model=OrderOut, status_code=status.HTTP_201_CREATED)
-async def create_order(
+def create_order(
     payload: OrderCreate,
     orders: OrderService = Depends(get_order_service),
     catalog: CatalogService = Depends(get_catalog_service),
@@ -44,7 +44,7 @@ async def create_order(
 
 
 @router.get("/{order_id}", response_model=OrderOut)
-async def get_order(
+def get_order(
     order_id: int,
     orders: OrderRepository = Depends(get_order_repo),
 ) -> OrderOut:
