@@ -1,0 +1,22 @@
+{
+  "GET /api/products/{sku}": {
+    "small": 0.9500000160187483,
+    "large": 0.9147500386461616
+  },
+  "GET /api/orders/{id}": {
+    "small": 0.8518749382346869,
+    "large": 0.8322499925270677
+  },
+  "GET /api/catalog/facets": {
+    "small": 2.9116665245965123,
+    "large": 13.779895496554673
+  },
+  "GET /api/reports/reorder": {
+    "small": 30.845708097331226,
+    "large": 596.218749997206
+  },
+  "POST /api/orders burst [batch ms]": {
+    "small": 243.83008293807507,
+    "large": 1832.1425409521908
+  }
+}

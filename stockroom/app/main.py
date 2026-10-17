@@ -1,3 +1,4 @@
+from app.services.catalog import FacetsCache
 import time
 from typing import Callable
 
@@ -21,6 +22,7 @@ def create_app(
     app.state.settings = settings
     app.state.carrier = carrier or MockCarrierClient(settings.carrier_latency_ms)
     app.state.clock = clock
+    app.state.facets_cache = FacetsCache()
 
     @app.get("/healthz", tags=["ops"])
     async def healthz() -> dict:

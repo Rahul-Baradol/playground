@@ -1,3 +1,5 @@
+from collections.abc import Callable
+import threading
 from collections import Counter
 from functools import lru_cache
 
@@ -8,6 +10,29 @@ from app.repository import Product, ProductRepository, StockRepository
 class DuplicateSkuError(Exception):
     pass
 
+class FacetsCache:
+    """Holds the latest facets for the lifetime of the app."""
+
+    def __init__(self):
+        self._value: Facets | None = None
+        self._generation = 0
+        self._lock = threading.Lock()
+
+    def get_or_compute(self, compute: Callable[[], Facets]) -> Facets:
+        with self._lock:
+            if self._value is not None:
+                return self._value
+            generation = self._generation
+        value = compute()
+        with self._lock:
+            if generation == self._generation:
+                self._value = value
+        return value
+
+    def invalidate(self) -> None:
+        with self._lock:
+            self._generation += 1
+            self._value = None
 
 class CatalogService:
     def __init__(
@@ -15,10 +40,12 @@ class CatalogService:
         products: ProductRepository,
         stock: StockRepository,
         price_bucket_edges_cents: tuple[int, ...],
+        facets_cache: FacetsCache = FacetsCache()
     ):
         self.products = products
         self.stock = stock
         self.price_bucket_edges_cents = price_bucket_edges_cents
+        self.facets_cache = facets_cache
 
     def create_product(
         self,
@@ -46,8 +73,10 @@ class CatalogService:
         self.invalidate()
         return self.stock.on_hand(product.id)
 
-    @lru_cache(maxsize=1)
     def facets(self) -> Facets:
+        return self.facets_cache.get_or_compute(self._facets)
+
+    def _facets(self) -> Facets:
         products = self.products.list_all()
         on_hand = self.stock.on_hand_all()
 
@@ -76,7 +105,7 @@ class CatalogService:
         )
 
     def invalidate(self) -> None:
-        self.facets.cache_clear()
+        self.facets_cache.invalidate()
 
     def _buckets(self) -> list[tuple[str, int, int | None]]:
         edges = self.price_bucket_edges_cents

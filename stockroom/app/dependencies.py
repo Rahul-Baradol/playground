@@ -1,3 +1,4 @@
+from app.services.catalog import FacetsCache
 import sqlite3
 from typing import Callable, Iterator
 
@@ -45,13 +46,16 @@ def get_stock_repo(conn: sqlite3.Connection = Depends(get_conn)) -> StockReposit
 def get_order_repo(conn: sqlite3.Connection = Depends(get_conn)) -> OrderRepository:
     return OrderRepository(conn)
 
+def get_facets_cache(request: Request) -> FacetsCache:
+    return request.app.state.facets_cache
 
 def get_catalog_service(
     products: ProductRepository = Depends(get_product_repo),
     stock: StockRepository = Depends(get_stock_repo),
     settings: Settings = Depends(get_settings),
+    facets_cache: FacetsCache = Depends(get_facets_cache),
 ) -> CatalogService:
-    return CatalogService(products, stock, settings.price_bucket_edges_cents)
+    return CatalogService(products, stock, settings.price_bucket_edges_cents, facets_cache)
 
 
 def get_order_service(

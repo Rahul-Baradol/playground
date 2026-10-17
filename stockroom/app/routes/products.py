@@ -77,5 +77,5 @@ async def record_movement(
 
 
 @router.get("/catalog/facets", response_model=Facets)
-async def get_facets(catalog: CatalogService = Depends(get_catalog_service)) -> Facets:
+def get_facets(catalog: CatalogService = Depends(get_catalog_service)) -> Facets:
     return catalog.facets()
